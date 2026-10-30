@@ -9,7 +9,7 @@
         body {
             margin: 0; padding: 0;
             background-color: #f4f6fb;
-            font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', sans-serif;
+            font-family: "Comic Sans MS", "KaiTi", "PingFang SC", "Microsoft YaHei", sans-serif; 
             height: 100vh;
             overflow: hidden;
             display: flex;
@@ -151,8 +151,23 @@
             background: linear-gradient(135deg, #fff0f5 0%, #ffe4e1 100%);
             border: 2px solid #ffb6c1;
         }
-        .final-card .title { font-size: 28px; color: #ec4899; margin-bottom: 10px; }
-        .final-card .name { font-size: 22px; font-weight: bold; margin-bottom: 20px; color: #8b5cf6; }
+        .final-card .title { 
+    	font-size: 28px; 
+    	color: #ec4899; 
+    	margin-bottom: 10px; 
+    	text-align: center; /* 👈 强制居中 */
+    	width: 100%;
+	}
+	.final-card .name { 
+    	font-size: 20px; /* 👈 稍微改小一点，原本22px在手机上太长 */
+    	font-weight: bold; 
+    	margin-bottom: 20px; 
+    	color: #8b5cf6; 
+    	text-align: center; /* 👈 强制居中 */
+    	width: 100%;
+    	line-height: 1.5; /* 👈 让换行后的间距好看点 */
+    	padding: 0 10px; /* 两边留一点白，防止贴边 */
+	}
         .final-card .msg { 
             font-size: 15px; line-height: 1.8; color: #555; 
             text-align: left; background: #fff; padding: 20px; 
@@ -254,14 +269,14 @@
         <div class="card hidden final-card" id="final-card">
             <div class="emoji">🎂</div>
             <div class="title">解密成功！</div>
-            <div class="name">祝 XXX 小朋友 19 岁生日快乐！</div>
+            <div class="name">祝 申璐琪 小朋友 19 岁生日快乐！</div>
             
             <div class="msg">
-                <b>2007</b>：你来到这个世界的年份。<br>
-                <b>2022</b>：我们相遇，成为朋友的年份。<br>
+                <b>2007</b>：那一年你来到这个世界<br>
+                <b>2022</b>：我们相遇了<br>
                 <b>2026</b>：今年，你迎来了19岁。<br>
                 <b>1108</b>：11月8日，今天是独属于你的日子。<br><br>
-                虽然我也 19 岁啦，但谁让我比你大几个月呢？小屁孩，以后的代码里不要有 Bug，生活里也要乖乖听姐姐的话哦~ 
+                十九岁，愿你保持对世界的好奇，对未来的野心，以及对生活本身的热爱。去成为你想成为的任何人，而不是别人期待你成为的人。
             </div>
             <button style="margin-top: 10px; width: 80%;" onclick="location.reload()">重新体验解密</button>
         </div>
