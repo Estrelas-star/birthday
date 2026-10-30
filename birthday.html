@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Happy 19th Birthday - 解密版</title>
+    <style>
+        /* 1. 明亮、干净的奶油白底色 */
+        body {
+            margin: 0; padding: 0;
+            background-color: #f4f6fb;
+            font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* 2. 背景漂浮的马卡龙气泡 */
+        .bg-shapes {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1; pointer-events: none;
+        }
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            box-shadow: inset 0 0 20px rgba(255,255,255,0.8), 0 10px 30px rgba(0,0,0,0.03);
+            animation: float 6s ease-in-out infinite alternate;
+        }
+        .s1 { width: 180px; height: 180px; top: 10%; left: 10%; background: rgba(255, 179, 198, 0.3); }
+        .s2 { width: 250px; height: 250px; bottom: 10%; right: 10%; background: rgba(168, 230, 207, 0.3); animation-delay: 1s; }
+        .s3 { width: 100px; height: 100px; top: 20%; right: 25%; background: rgba(255, 235, 167, 0.4); animation-delay: 2s; }
+        .s4 { width: 140px; height: 140px; bottom: 25%; left: 20%; background: rgba(170, 206, 255, 0.3); animation-delay: 3s; }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(-30px); }
+        }
+
+        /* 3. 粒子画布 */
+        #canvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 2; pointer-events: none;
+        }
+
+        /* 4. 卡片容器：绝对居中 */
+        .card-container {
+            position: relative;
+            width: 100%;
+            max-width: 380px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        /* 核心修改：卡片高度自适应，绝对居中 */
+        .card {
+            position: absolute; 
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(1);
+            width: 100%;
+            height: auto; /* 高度由内容撑开 */
+            background: rgba(255, 255, 255, 0.85); 
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            display: flex; flex-direction: column; align-items: center;
+            padding: 35px 25px; box-sizing: border-box;
+            color: #333; 
+            transition: opacity 0.5s, transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* 翻页动画 */
+        .card.fade-out { 
+            opacity: 0; 
+            transform: translate(-50%, -50%) scale(0.9); 
+        }
+        .card.hidden { display: none; }
+
+        /* UI 元素 */
+        .level-tag {
+            font-size: 12px; color: #8b5cf6; letter-spacing: 2px;
+            text-transform: uppercase; font-weight: bold;
+            border: 1px solid #c4b5fd; background: #f3e8ff;
+            padding: 4px 12px; border-radius: 20px;
+            margin-bottom: 20px;
+        }
+
+        .title { font-size: 22px; font-weight: bold; margin-bottom: 15px; text-align: center; color: #1e293b; letter-spacing: 1px; }
+        
+        /* 居中排版的文本描述 */
+        .desc { 
+            font-size: 15px; color: #64748b; line-height: 1.8; 
+            margin-bottom: 25px; text-align: center;
+        }
+
+        /* 题目/代码框排版 */
+        .math-box, .code-box {
+            background: #f8fafc; border-radius: 12px; padding: 20px;
+            width: 100%; box-sizing: border-box; margin-bottom: 25px;
+            line-height: 1.8; border-left: 4px solid #8b5cf6;
+            color: #334155;
+        }
+        .math-box { font-family: 'Times New Roman', serif; font-size: 17px; text-align: left; }
+        .code-box { font-family: 'Courier New', Courier, monospace; font-size: 15px; background: #282c34; color: #abb2bf; border-left-color: #61afef; text-align: left; }
+        
+        .code-box span.keyword { color: #c678dd; }
+        .code-box span.number { color: #d19a66; }
+        .code-box span.operator { color: #56b6c2; }
+
+        /* 输入框和按钮 */
+        input[type="text"] {
+            width: 100%; padding: 15px; box-sizing: border-box;
+            background: #fff; border: 2px solid #cbd5e1;
+            border-radius: 12px; color: #333; font-size: 18px; text-align: center;
+            letter-spacing: 5px; outline: none; transition: border 0.3s;
+            margin-bottom: 20px; font-weight: bold;
+        }
+        input[type="text"]:focus { border-color: #8b5cf6; box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15); }
+
+        button {
+            width: 100%; padding: 15px; border: none; border-radius: 12px;
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            color: #fff; font-size: 16px; font-weight: bold; cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(236, 72, 153, 0.3); }
+
+        /* 选项按钮 */
+        .option {
+            width: 100%; padding: 15px; margin-bottom: 12px;
+            background: #fff; border: 2px solid #e2e8f0;
+            border-radius: 12px; color: #334155; font-size: 16px; text-align: center;
+            cursor: pointer; transition: all 0.3s; font-weight: bold;
+        }
+        .option:hover { background: #f3e8ff; border-color: #c4b5fd; }
+
+        /* 错误提示 */
+        .error-msg { color: #f43f5e; font-size: 14px; margin-top: -10px; margin-bottom: 15px; display: none; font-weight: bold; }
+
+        /* 最终贺卡样式 */
+        .final-card {
+            background: linear-gradient(135deg, #fff0f5 0%, #ffe4e1 100%);
+            border: 2px solid #ffb6c1;
+        }
+        .final-card .title { font-size: 28px; color: #ec4899; margin-bottom: 10px; }
+        .final-card .name { font-size: 22px; font-weight: bold; margin-bottom: 20px; color: #8b5cf6; }
+        .final-card .msg { 
+            font-size: 15px; line-height: 1.8; color: #555; 
+            text-align: left; background: #fff; padding: 20px; 
+            border-radius: 12px; margin-bottom: 20px; 
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); width: 100%; box-sizing: border-box;
+        }
+        .final-card .emoji { font-size: 60px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="bg-shapes">
+        <div class="shape s1"></div>
+        <div class="shape s2"></div>
+        <div class="shape s3"></div>
+        <div class="shape s4"></div>
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+    <div class="card-container" id="card-container">
+        
+        <!-- ================= 关卡1：线代 ================= -->
+        <div class="card" id="level-1">
+            <div class="level-tag">Level 1 / 矩阵迷阵</div> <!-- 🌟 改了标签 -->
+            <div class="title">矩阵与行列式</div>
+            <div class="desc">设 A 为 3 阶方阵，已知其行列式 |2A| = 8 × 2007。<br>那么，矩阵 A 的行列式 |A| 的值是多少？</div>
+            
+            <button class="option" onclick="checkLevel1(this, false)">A. 2026</button>
+            <button class="option" onclick="checkLevel1(this, true)">B. 2007</button>
+            <button class="option" onclick="checkLevel1(this, false)">C. 2008</button>
+            <button class="option" onclick="checkLevel1(this, false)">D. 2027</button>
+            <div class="error-msg" id="error-1">再想想，|kA| = k^n|A|，这里的 n 是阶数哦~</div>
+        </div>
+
+        <!-- ================= 关卡2：具身智能 ================= -->
+        <div class="card hidden" id="level-2">
+            <div class="level-tag">Level 2 / 前沿科技</div> <!-- 🌟 改了标签 -->
+            <div class="title">具身智能前沿</div>
+            <div class="desc">近年来，具身智能成为科技圈最火热的风口。科技狂人马斯克曾带着一个名为“Optimus（擎天柱）”的人形机器人原型机惊艳亮相。<br><br>请问：<b>特斯拉首次正式展示 Optimus 人形机器人实体原型机，是在哪一年？</b></div>
+            
+            <input type="text" id="input-2" placeholder="输入4位年份" maxlength="4">
+            <div class="error-msg" id="error-2">答案错误（提示：不是 2021 年那个跳舞的假人哦）</div>
+            <button onclick="checkLevel2()">提交答案</button>
+        </div>
+
+        <!-- ================= 关卡3：C语言 ================= -->
+        <div class="card hidden" id="level-3">
+            <div class="level-tag">Level 3 / 底层代码</div> <!-- 🌟 改了标签 -->
+            <div class="title">代码迷阵</div>
+            <div class="desc">作为未来的计科大佬，读懂底层代码是基本功。请阅读以下 C 语言代码片段，心算得出变量 result 的十进制值：</div>
+            
+            <div class="code-box">
+                <span class="keyword">int</span> result = (<span class="number">1</span> <span class="operator"><<</span> <span class="number">11</span>) <span class="operator">-</span> (<span class="number">16</span> <span class="operator">|</span> <span class="number">4</span> <span class="operator">|</span> <span class="number">2</span>);
+            </div>
+            
+            <input type="text" id="input-3" placeholder="输入十进制数值" maxlength="4">
+            <div class="error-msg" id="error-3">答案错误（提示：注意按位或的优先级）</div>
+            <button onclick="checkLevel3()">提交答案</button>
+        </div>
+
+        <!-- ================= 关卡4：高数 ================= -->
+        <div class="card hidden" id="level-4">
+            <div class="level-tag">Level 4 / 终极极限</div> <!-- 🌟 改了标签 -->
+            <div class="title">四重极限试炼</div>
+            <div class="desc">请分别求出以下四个极限的值，按顺序拼成一个四位数字密码：</div>
+            
+            <div class="math-box">
+                ① lim <sub>x→0</sub> (e<sup>2x</sup> - 1) / ln(1+2x) = ?<br>
+                ② lim <sub>x→0</sub> (∛(1+3x) - 1) / ln(1+x) = ?<br>
+                ③ lim <sub>x→0</sub> x · (1+3x)<sup>1/x</sup> = ?<br>
+                ④ lim <sub>x→0</sub> (√(1+tan 8x) - √(1-sin 8x)) / ln(1+x) = ?
+            </div>
+            
+            <input type="text" id="input-4" placeholder="输入4位密码" maxlength="4">
+            <div class="error-msg" id="error-4">答案错误（提示：第二题利用根式等价，第三题注意极限是 0）</div>
+            <button onclick="checkLevel4()">提交答案</button>
+        </div>
+
+        <!-- ================= 通关：最终贺卡 ================= -->
+        <div class="card hidden final-card" id="final-card">
+            <div class="emoji">🎂</div>
+            <div class="title">解密成功！</div>
+            <div class="name">祝 XXX 小朋友 19 岁生日快乐！</div>
+            
+            <div class="msg">
+                <b>2007</b>：你来到这个世界的年份。<br>
+                <b>2022</b>：我们相遇，成为朋友的年份。<br>
+                <b>2026</b>：今年，你迎来了19岁。<br>
+                <b>1108</b>：11月8日，今天是独属于你的日子。<br><br>
+                虽然我也 19 岁啦，但谁让我比你大几个月呢？小屁孩，以后的代码里不要有 Bug，生活里也要乖乖听姐姐的话哦~ 
+            </div>
+            <button style="margin-top: 10px; width: 80%;" onclick="location.reload()">重新体验解密</button>
+        </div>
+
+    </div>
+
+    <script>
+        /* ==========================================
+           解密逻辑与动画
+           ========================================== */
+        function transitionToNext(currentId, nextId) {
+            const currentCard = document.getElementById(currentId);
+            const nextCard = document.getElementById(nextId);
+            
+            currentCard.classList.add('fade-out');
+            
+            setTimeout(() => {
+                currentCard.classList.add('hidden');
+                nextCard.classList.remove('hidden');
+                triggerBurst(); // 触发粒子爆炸
+            }, 500);
+        }
+
+        // 关卡1：线代 (答案：2007)
+        function checkLevel1(btn, isCorrect) {
+            if (isCorrect) {
+                document.getElementById('error-1').style.display = 'none';
+                transitionToNext('level-1', 'level-2');
+            } else {
+                document.getElementById('error-1').style.display = 'block';
+                btn.style.borderColor = '#f43f5e';
+            }
+        }
+
+        // 关卡2：具身智能 (答案：2022)
+        function checkLevel2() {
+            const input = document.getElementById('input-2').value;
+            if (input === '2022') {
+                document.getElementById('error-2').style.display = 'none';
+                transitionToNext('level-2', 'level-3');
+            } else {
+                document.getElementById('error-2').style.display = 'block';
+            }
+        }
+
+        // 关卡3：C语言 (答案：2026)
+        function checkLevel3() {
+            const input = document.getElementById('input-3').value;
+            if (input === '2026') {
+                document.getElementById('error-3').style.display = 'none';
+                transitionToNext('level-3', 'level-4');
+            } else {
+                document.getElementById('error-3').style.display = 'block';
+            }
+        }
+
+        // 关卡4：高数 (答案：1108)
+        function checkLevel4() {
+            const input = document.getElementById('input-4').value;
+            if (input === '1108') {
+                document.getElementById('error-4').style.display = 'none';
+                transitionToNext('level-4', 'final-card');
+            } else {
+                document.getElementById('error-4').style.display = 'block';
+            }
+        }
+
+        /* ==========================================
+           Canvas 粒子星空与爆炸特效
+           ========================================== */
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+        
+        let bgStars = [];
+        let burstParticles = [];
+        const candyColors = ['#FF9A9E', '#FECFEF', '#A8E6CF', '#FFD3B6', '#FFAAA5', '#87CEFA', '#FFD700'];
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        for (let i = 0; i < 80; i++) {
+            bgStars.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                size: Math.random() * 3 + 1,
+                alpha: Math.random() * 0.5 + 0.2,
+                speed: Math.random() * 0.4 + 0.1
+            });
+        }
+
+        function triggerBurst() {
+            const centerX = width / 2;
+            const centerY = height / 2;
+            
+            for (let i = 0; i < 100; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 8 + 3;
+                burstParticles.push({
+                    x: centerX, y: centerY,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    size: Math.random() * 5 + 2,
+                    color: candyColors[Math.floor(Math.random() * candyColors.length)],
+                    life: 1
+                });
+            }
+        }
+
+        function render() {
+            ctx.clearRect(0, 0, width, height);
+
+            bgStars.forEach(star => {
+                star.y -= star.speed;
+                if (star.y < 0) star.y = height;
+                
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(139, 92, 246, ${star.alpha})`; 
+                ctx.fill();
+            });
+
+            for (let i = burstParticles.length - 1; i >= 0; i--) {
+                let p = burstParticles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vx *= 0.95; 
+                p.vy *= 0.95;
+                p.vy += 0.1;  
+                p.life -= 0.02;
+
+                if (p.life <= 0) {
+                    burstParticles.splice(i, 1);
+                    continue;
+                }
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = p.life;
+                ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+            requestAnimationFrame(render);
+        }
+        render();
+    </script>
+</body>
+</html>
