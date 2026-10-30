@@ -160,9 +160,27 @@
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); width: 100%; box-sizing: border-box;
         }
         .final-card .emoji { font-size: 60px; margin-bottom: 10px; }
+
+	/* 音乐按钮样式 */
+	.music-btn {
+    	position: fixed; top: 20px; right: 20px; width: 44px; height: 44px;
+   	background: rgba(255, 255, 255, 0.8); border-radius: 50%;
+    	display: flex; justify-content: center; align-items: center;
+    	font-size: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    	cursor: pointer; z-index: 999; transition: all 0.3s;
+    	backdrop-filter: blur(10px);
+	}
+	.music-btn:active { transform: scale(0.9); }
+	.music-btn.paused { filter: grayscale(100%); opacity: 0.6; }
+	@keyframes spin { 100% { transform: rotate(360deg); } }
+	.music-btn.playing { animation: spin 3s linear infinite; }
     </style>
 </head>
 <body>
+	<!-- 悬浮的音乐控制按钮 -->
+	<div id="music-btn" class="music-btn paused" onclick="toggleMusic()">🎵</div>
+	<!-- 音乐音频文件 -->
+	<audio id="bgm" src="bgm.mp3" loop></audio>
 
     <div class="bg-shapes">
         <div class="shape s1"></div>
@@ -393,6 +411,36 @@
             requestAnimationFrame(render);
         }
         render();
+
+	// 背景音乐控制逻辑
+	const bgm = document.getElementById('bgm');
+	const musicBtn = document.getElementById('music-btn');
+	let isPlaying = false;
+
+	function toggleMusic() {
+    	if (isPlaying) {
+        	bgm.pause();
+       	 musicBtn.classList.remove('playing');
+        	musicBtn.classList.add('paused');
+    	} else {
+        	bgm.play();
+        	musicBtn.classList.remove('paused');
+       	 musicBtn.classList.add('playing');
+    	}
+    	isPlaying = !isPlaying;
+	}
+
+	// 突破微信限制：用户第一次点击屏幕任意位置时，自动尝试播放
+	document.body.addEventListener('touchstart', function autoPlayOnce() {
+    	if (!isPlaying) {
+       	 bgm.play().then(() => {
+            	isPlaying = true;
+            	musicBtn.classList.remove('paused');
+            	musicBtn.classList.add('playing');
+        	}).catch(e => console.log("需要手动点击喇叭"));
+    	}
+    	document.body.removeEventListener('touchstart', autoPlayOnce);
+	}, { once: true });
     </script>
 </body>
 </html>
