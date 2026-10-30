@@ -4,12 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Happy 19th Birthday - 解密版</title>
+    <!-- 🌟 引入可爱的圆体字库 -->
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    
     <style>
-        /* 1. 明亮、干净的奶油白底色，更改了圆润可爱的字体 */
+        /* 1. 全局基础设置 */
         body {
             margin: 0; padding: 0;
             background-color: #f4f6fb;
-            font-family: "Comic Sans MS", "KaiTi", "PingFang SC", "Microsoft YaHei", sans-serif; 
+            /* 🌟 字体优先使用可爱圆体，如果没有则用系统默认 */
+            font-family: 'ZCOOL KuaiLe', "PingFang SC", "Microsoft YaHei", sans-serif;
             height: 100vh;
             height: 100dvh;
             overflow: hidden;
@@ -139,7 +143,7 @@
 
         .error-msg { color: #f43f5e; font-size: 14px; margin-top: -10px; margin-bottom: 15px; display: none; font-weight: bold; }
 
-        /* 最终贺卡样式 (已修复居中，字体和间距) */
+        /* 🌟 最终贺卡样式（字体重构、绝对居中） */
         .final-card {
             background: linear-gradient(135deg, #fff0f5 0%, #ffe4e1 100%);
             border: 2px solid #ffb6c1;
@@ -152,18 +156,19 @@
             width: 100%;
         }
         .final-card .name { 
-            font-size: 20px; 
+            font-size: 22px; 
             font-weight: bold; 
             margin-bottom: 20px; 
             color: #8b5cf6; 
             text-align: center; 
             width: 100%;
-            line-height: 1.5; 
+            line-height: 1.6; 
             padding: 0 10px; 
+            word-wrap: break-word; /* 防止长名字撑破 */
         }
         .final-card .msg { 
-            font-size: 14px; line-height: 1.8; color: #555; 
-            text-align: left; background: #fff; padding: 15px; 
+            font-size: 15px; line-height: 1.9; color: #555; 
+            text-align: left; background: #fff; padding: 20px; 
             border-radius: 12px; margin-bottom: 20px; 
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); width: 100%; box-sizing: border-box;
         }
@@ -263,15 +268,16 @@
         <div class="card hidden final-card" id="final-card">
             <div class="emoji">🎂</div>
             <div class="title">解密成功！</div>
-            <!-- ⚠️ 记得把下面的 XXX 改成他的名字！ -->
-            <div class="name">祝 XXX 小朋友 19 岁生日快乐！</div>
+            
+            <!-- ⚠️⚠️⚠️ 就是这里！把下面的 XXX 改成他的名字！ -->
+            <div class="name">祝 申璐琪 小朋友<br>19 岁生日快乐！</div>
             
             <div class="msg">
-                <b>2007</b>：你来到这个世界的年份。<br>
-                <b>2022</b>：我们相遇，成为朋友的年份。<br>
+                <b>2007</b>：那一年你来到了这个世界<br>
+                <b>2022</b>：某天，你遇到了拥有可爱灵魂的我<br>
                 <b>2026</b>：今年，你迎来了19岁。<br>
                 <b>1108</b>：11月8日，今天是独属于你的日子。<br><br>
-                虽然我也 19 岁啦，但谁让我比你大几个月呢？小屁孩，以后的代码里不要有 Bug，生活里也要乖乖听姐姐的话哦~ 
+                愿你保持对世界的好奇，对未来的野心，以及对生活本身的热爱。去成为你想成为的任何人，而不是别人期待你成为的人。
             </div>
             <button style="margin-top: 10px; width: 80%;" onclick="location.reload()">重新体验解密</button>
         </div>
