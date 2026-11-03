@@ -195,6 +195,7 @@
     <div id="music-btn" class="music-btn paused" onclick="toggleMusic()">🎵</div>
     <!-- 音乐音频文件 -->
     <audio id="bgm" src="bgm.mp3" loop preload="auto"></audio>
+    <audio id="hbd" src="hbd.mp3" loop preload="auto"></audio>
 
     <div class="bg-shapes">
         <div class="shape s1"></div>
@@ -357,14 +358,38 @@
         }
 
         function checkLevel4() {
-            const input = document.getElementById('input-4').value;
-            if (input === '1108') {
-                document.getElementById('error-4').style.display = 'none';
-                transitionToNext('level-4', 'final-card');
-            } else {
-                document.getElementById('error-4').style.display = 'block';
-            }
-        }
+    		const input = document.getElementById('input-4').value;
+    		if (input === '1108') {
+        		document.getElementById('error-4').style.display = 'none';
+        
+        		// 🌟 核心切歌逻辑：暂停原音乐，播放生日快乐歌
+        		const oldBgm = document.getElementById('bgm');
+        		oldBgm.pause(); // 暂停原来的歌
+        
+        		const hbdSong = document.getElementById('hbd');
+        		hbdSong.play().catch(e => console.log("切歌被浏览器拦截")); // 播放生日歌
+        
+        		// 顺手把右上角的音乐按钮状态改成“正在播放”
+        		isPlaying = true;
+        		musicBtn.classList.remove('paused');
+        		musicBtn.classList.add('playing');
+        		// 如果用户这时候点右上角的按钮，就控制新歌的暂停/播放
+        		musicBtn.onclick = function() {
+            		if (hbdSong.paused) {
+                		hbdSong.play();
+                		musicBtn.classList.add('playing');
+            		} else {
+                		hbdSong.pause();
+                		musicBtn.classList.remove('playing');
+            		}
+        		};
+
+        		// 触发翻页动画
+        		transitionToNext('level-4', 'final-card');
+    		} else {
+        		document.getElementById('error-4').style.display = 'block';
+    		}
+       }
 
         // 粒子特效
         const canvas = document.getElementById('canvas');
